@@ -12,25 +12,23 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import fr.isima.kyou.apiaccess.OpenFoodGetter;
+import fr.isima.kyou.beans.Root;
 
 /**
  * Hello world!
  *
  */
 @SpringBootApplication
-public class App 
-{
-    public static void main( String[] args ) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException
-    {
-        SpringApplication.run(App.class, args);
-        OpenFoodGetter ofg = new OpenFoodGetter();
-        try {
-			ofg.getData(new Long("3029330003533"));
+public class App {
+	public static void main(String[] args) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+		SpringApplication.run(App.class, args);
+		final OpenFoodGetter ofg = OpenFoodGetter.getInstance();
+		try {
+			final Root result = ofg.getData("3029330003533");
 		} catch (NumberFormatException | IOException | JSONException | UnirestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    }
-    
-    
+	}
+
 }
