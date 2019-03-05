@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="IProducts" class="fr.isima.kyou.dbaccess.interfaces.IProducts" ></bean>
+	<bean id="IBaskets" class="fr.isima.kyou.dbaccess.interfaces.IBaskets"  ></bean>
+	<bean id="IUsers" class="fr.isima.kyou.dbaccess.interfaces.IUsers" ></bean>
+	<bean id="IBasketProducts" class="fr.isima.kyou.dbaccess.interfaces.IBasketProducts"></bean>
+	
+	<bean id="ITest" class="fr.isima.kyou.apiaccess.ITest"></bean>
+
+</beans>
