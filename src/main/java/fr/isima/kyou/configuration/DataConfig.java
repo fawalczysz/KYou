@@ -10,7 +10,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.sqlite.SQLiteDataSource;
 
 @Configuration
-@MapperScan("fr.isima.kyou.dbaccess.mybatis.interfaces")
+@MapperScan("fr.isima.kyou.dbaccess.mybatis.dao")
 public class DataConfig {
 
 	@Bean

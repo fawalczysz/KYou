@@ -8,4 +8,6 @@ import fr.isima.kyou.beans.User;
 public interface IUserService {
 
 	User getUser(String email);
+
+	Integer addUser(User user);
 }

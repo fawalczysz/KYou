@@ -7,6 +7,12 @@ public class User {
 	private String lastname;
 	private String email;
 
+	public User(String firstname, String lastname, String email) {
+		setFirstname(firstname);
+		setLastname(lastname);
+		setEmail(email);
+	}
+
 	public Integer getId() {
 		return id;
 	}

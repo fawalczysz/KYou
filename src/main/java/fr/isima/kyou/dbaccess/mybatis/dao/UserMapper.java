@@ -1,15 +1,14 @@
-package fr.isima.kyou.dbaccess.mybatis.interfaces;
+package fr.isima.kyou.dbaccess.mybatis.dao;
 
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 
 import fr.isima.kyou.beans.User;
 
 @Component
-public interface IUserMapper {
+public interface UserMapper {
 
-	@Select("SELECT * FROM Users WHERE email = #{userId}")
 	User getUser(@Param("userId") String userId);
 
+	void addUser(@Param("user") User user);
 }
