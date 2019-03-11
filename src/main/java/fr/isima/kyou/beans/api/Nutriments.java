@@ -1,4 +1,4 @@
-package fr.isima.kyou.beans;
+package fr.isima.kyou.beans.api;
 
 public class Nutriments {
 

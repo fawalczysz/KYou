@@ -3,7 +3,7 @@ package fr.isima.kyou.dbaccess.mybatis.dao;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
-import fr.isima.kyou.beans.User;
+import fr.isima.kyou.beans.dao.User;
 
 @Component
 public interface UserMapper {

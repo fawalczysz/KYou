@@ -1,12 +1,15 @@
 package fr.isima.kyou.rest.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.isima.kyou.beans.User;
+import fr.isima.kyou.beans.dao.Basket;
+import fr.isima.kyou.beans.dao.User;
 import fr.isima.kyou.services.interfaces.IUserService;
 
 @RestController
@@ -18,6 +21,12 @@ public class UserController {
 	@GetMapping("/user")
 	public ResponseEntity<User> user(@RequestParam String email) {
 		return ResponseEntity.ok(userservice.getUser(email));
+	}
+
+	@GetMapping("/baskets")
+	public ResponseEntity<List<Basket>> getBasketsOfUser(@RequestParam String email) {
+		final User user = userservice.getUser(email);
+		return ResponseEntity.ok(userservice.selectBasketsOfUser(user));
 	}
 
 	@GetMapping("/createUser")

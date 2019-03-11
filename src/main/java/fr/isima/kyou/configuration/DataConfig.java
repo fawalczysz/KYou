@@ -29,7 +29,7 @@ public class DataConfig {
 	public SqlSessionFactoryBean sqlSessionFactory() throws Exception {
 		final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
-		sessionFactory.setTypeAliasesPackage("fr.isima.kyou");
+		sessionFactory.setTypeAliasesPackage("fr.isima.kyou.beans.dao");
 		return sessionFactory;
 	}
 }

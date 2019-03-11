@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="fr.isima.kyou.dbaccess.mybatis.dao.BasketMapper">
+
+	<resultMap type="User" id="userResultMap">
+		<id property="id" column="id" />
+		<result property="firstname" column="firstname" />
+		<result property="lastname" column="lastname" />
+		<result property="email" column="email" />
+	</resultMap>
+
+	<resultMap type="Basket" id="basketResultMap">
+		<id property="id" column="id" />
+		<result property="basketNumber" column="basketNumber" />
+		<association property="userId" column="userId"
+			resultMap="userResultMap" />
+	</resultMap>
+
+
+	<select id="selectBasketsOfUser"
+		parameterType="User" resultMap="basketResultMap">
+		Select
+		ba.id,
+		ba.basketNumber,
+		ba.userId,
+		u.firstname,
+		u.lastname,
+		u.email
+		From
+		Baskets ba
+		join Users u on u.id=ba.userId
+		where u.email=#{user.email}
+	</select>
+
+
+</mapper>
+

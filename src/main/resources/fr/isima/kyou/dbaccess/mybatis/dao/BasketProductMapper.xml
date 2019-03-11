@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="fr.isima.kyou.dbaccess.mybatis.dao.BasketProductMapper">
+
+	<resultMap type="User" id="userResultMap">
+		<id property="id" column="id" />
+		<result property="firstname" column="firstname" />
+		<result property="lastname" column="lastname" />
+		<result property="email" column="email" />
+	</resultMap>
+
+	<resultMap type="Basket" id="basketResultMap">
+		<id property="id" column="id" />
+		<result property="basketNumber" column="basketNumber" />
+		<association property="userId" column="userId"
+			resultMap="userResultMap" />
+	</resultMap>
+	
+	<resultMap type="Product" id="productResultMap">
+		<id property="id" column="id" />
+		<result property="barCode" column="barCode" />
+	</resultMap>
+
+	<resultMap id="basketProductResultMap" type="BasketProduct">
+		<id property="id" column="id" />
+		<result property="productNumber" column="productNumber" />
+		<association property="product" column="productId"
+			resultMap="productResultMap" />
+		<association property="basket" column="basketId"
+			resultMap="basketResultMap" />
+	</resultMap>
+
+	<select id="selectProductsFromBasket" parameterType="Basket"
+		resultMap="basketProductResultMap">
+		select * from basketProducts bp
+		join Baskets ba on
+		ba.id=bp.basketId
+		join Products pr on pr.id=bp.productId
+		where
+		bp.basketId=#{basket.id}
+	</select>
+</mapper>
+
