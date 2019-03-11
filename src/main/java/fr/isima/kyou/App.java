@@ -6,7 +6,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
 import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -23,6 +22,7 @@ import fr.isima.kyou.beans.Root;
 public class App {
 
 	public static void main(String[] args) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+		System.setProperty("spring.devtools.restart.enabled", "true");
 		SpringApplication.run(App.class, args);
 		final OpenFoodGetter ofg = OpenFoodGetter.getInstance();
 		try {

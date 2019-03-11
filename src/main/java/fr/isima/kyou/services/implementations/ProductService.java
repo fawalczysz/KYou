@@ -15,7 +15,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import fr.isima.kyou.apiaccess.OpenFoodGetter;
 import fr.isima.kyou.beans.Root;
 import fr.isima.kyou.dbaccess.interfaces.IBasketProducts;
-import fr.isima.kyou.dbaccess.interfaces.IBaskets;
 import fr.isima.kyou.dbaccess.interfaces.IProducts;
 import fr.isima.kyou.dbaccess.interfaces.IUsers;
 import fr.isima.kyou.services.interfaces.IProductService;
@@ -27,9 +26,6 @@ public class ProductService implements IProductService {
 	IProducts products;
 
 	@Autowired
-	IBaskets baskets;
-
-	@Autowired
 	IBasketProducts basketProduct;
 
 	@Autowired
@@ -39,7 +35,6 @@ public class ProductService implements IProductService {
 	public void selectAll() {
 		users.selectAll();
 		products.selectAll();
-		baskets.selectAll();
 		basketProduct.selectAll();
 	}
 
