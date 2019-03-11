@@ -1,10 +1,11 @@
 package fr.isima.kyou.services.interfaces;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
 
+import fr.isima.kyou.beans.User;
+
+@Service
 public interface IUserService {
 
-	void selectAll();
-
-	List<Integer> selectBasketsOfUser(String email);
+	User getUser(String email);
 }

@@ -8,7 +8,18 @@
 	<bean id="IBaskets" class="fr.isima.kyou.dbaccess.interfaces.IBaskets"  ></bean>
 	<bean id="IUsers" class="fr.isima.kyou.dbaccess.interfaces.IUsers" ></bean>
 	<bean id="IBasketProducts" class="fr.isima.kyou.dbaccess.interfaces.IBasketProducts"></bean>
-	
-	<bean id="ITest" class="fr.isima.kyou.apiaccess.ITest"></bean>
+	<bean id="IUserMapper" class="fr.isima.kyou.dbaccess.mybatis.interfaces.IUserMapper"></bean>
 
+
+	<bean id="userMapper"
+		class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="fr.isima.kyou.dbaccess.mybatis.interfaces.IUserMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="userService" class="fr.isima.kyou.services.implementations.UserService">
+  		<property name="userMapper" ref="userMapper" />
+	</bean>
+	
+	
 </beans>

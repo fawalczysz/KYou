@@ -14,15 +14,9 @@ public class UserController {
 	@Autowired
 	IUserService userservice;
 
-	@GetMapping("/selectallUsers")
-	public ResponseEntity selectAll() {
-		userservice.selectAll();
-		return ResponseEntity.ok("test");
-	}
-
-	@GetMapping("/basket")
-	public ResponseEntity basket(@RequestParam String email) {
-		return ResponseEntity.ok(userservice.selectBasketsOfUser(email));
+	@GetMapping("/user")
+	public ResponseEntity user(@RequestParam String email) {
+		return ResponseEntity.ok(userservice.getUser(email));
 	}
 
 }

@@ -8,6 +8,8 @@ import java.security.NoSuchAlgorithmException;
 import org.json.JSONException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 
@@ -19,6 +21,8 @@ import fr.isima.kyou.beans.Root;
  *
  */
 @SpringBootApplication
+@ComponentScan({ "fr.isima.kyou" })
+@EntityScan(basePackages = "fr.isima.kyou")
 public class App {
 
 	public static void main(String[] args) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
