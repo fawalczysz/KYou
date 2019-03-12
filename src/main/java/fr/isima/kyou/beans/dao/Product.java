@@ -4,10 +4,6 @@ public class Product {
 	private Integer id;
 	private String barCode;
 
-	public Product() {
-
-	}
-
 	public Integer getId() {
 		return id;
 	}

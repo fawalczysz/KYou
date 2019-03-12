@@ -42,7 +42,6 @@ public class ProductService implements IProductService {
 			throw new DaoException("Basket Does not exist");
 
 		Product product = productMapper.getProductFromBarCode(barCode);
-		System.out.println(product);
 		if (product == null) {
 			product = new Product();
 			product.setBarCode(barCode);
@@ -68,11 +67,16 @@ public class ProductService implements IProductService {
 
 	@Override
 	public BasketProduct removeProductInBasket(String email, String barCode, Integer basketId) throws DaoException {
-		final Product product = new Product();
-		final Basket basket = new Basket();
-		final BasketProduct bp = new BasketProduct();
+		Product product = null;
+		Basket basket = null;
+		BasketProduct bp = null;
+
+		product = productMapper.getProductFromBarCode(barCode);
+		basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
+		bp = basketProductMapper.selectProductFromBasket(basket, product);
 
 		checkMandatories(product, basket, bp, email, barCode, basketId);
+
 		if (bp.getProductNumber() == 1) {
 			basketProductMapper.removeProductFromBasketProduct(bp, product);
 		} else {
@@ -84,9 +88,13 @@ public class ProductService implements IProductService {
 
 	@Override
 	public void removeAllProductInBasket(String email, String barCode, Integer basketId) throws DaoException {
-		final Product product = new Product();
-		final Basket basket = new Basket();
-		final BasketProduct bp = new BasketProduct();
+		Product product = new Product();
+		Basket basket = new Basket();
+		BasketProduct bp = new BasketProduct();
+
+		product = productMapper.getProductFromBarCode(barCode);
+		basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
+		bp = basketProductMapper.selectProductFromBasket(basket, product);
 
 		checkMandatories(product, basket, bp, email, barCode, basketId);
 		basketProductMapper.removeProductFromBasketProduct(bp, product);
@@ -95,15 +103,12 @@ public class ProductService implements IProductService {
 	private void checkMandatories(Product product, Basket basket, BasketProduct bp, String email, String barCode,
 			Integer basketId) throws DaoException {
 
-		product = productMapper.getProductFromBarCode(barCode);
 		if (product == null)
 			throw new DaoException("Product does not exist");
 
-		basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
 		if (basket == null)
 			throw new DaoException("Basket Does not exist");
 
-		bp = basketProductMapper.selectProductFromBasket(basket, product);
 		if (bp == null)
 			throw new DaoException("Product does not exist in Basket");
 

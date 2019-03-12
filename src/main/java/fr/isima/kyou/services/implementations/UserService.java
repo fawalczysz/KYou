@@ -34,8 +34,7 @@ public class UserService implements IUserService {
 
 	@Override
 	public List<Basket> selectBasketsOfUser(User user) {
-		final List<Basket> baskets = basketMapper.selectBasketsOfUser(user);
-		return baskets;
+		return basketMapper.selectBasketsOfUser(user);
 	}
 
 	@Override
