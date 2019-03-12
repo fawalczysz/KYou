@@ -13,6 +13,10 @@ public class User {
 		setEmail(email);
 	}
 
+	public User() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public Integer getId() {
 		return id;
 	}

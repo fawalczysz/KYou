@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import fr.isima.kyou.beans.dao.Basket;
 import fr.isima.kyou.beans.dao.User;
+import fr.isima.kyou.exceptions.DaoException;
 
 @Service
 public interface IUserService {
@@ -15,4 +16,8 @@ public interface IUserService {
 	Integer addUser(User user);
 
 	List<Basket> selectBasketsOfUser(User user);
+
+	Basket selectBasketFromIdAndUser(String email, Integer basketId);
+
+	Basket createBasketFromuser(Integer basketNumber, String email) throws DaoException;
 }

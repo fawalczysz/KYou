@@ -2,8 +2,8 @@ package fr.isima.kyou.beans.dao;
 
 public class BasketProduct {
 	private Integer id;
-	private Basket basket;
-	private Product product;
+	private Basket basketId;
+	private Product productId;
 	private Integer productNumber;
 
 	public Integer getId() {
@@ -15,19 +15,19 @@ public class BasketProduct {
 	}
 
 	public Basket getBasket() {
-		return basket;
+		return basketId;
 	}
 
 	public void setBasket(Basket basket) {
-		this.basket = basket;
+		this.basketId = basket;
 	}
 
 	public Product getProduct() {
-		return product;
+		return productId;
 	}
 
 	public void setProduct(Product product) {
-		this.product = product;
+		this.productId = product;
 	}
 
 	public Integer getProductNumber() {

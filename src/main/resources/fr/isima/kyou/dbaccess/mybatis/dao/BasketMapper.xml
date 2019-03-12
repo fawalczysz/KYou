@@ -20,20 +20,38 @@
 	</resultMap>
 
 
-	<select id="selectBasketsOfUser"
-		parameterType="User" resultMap="basketResultMap">
-		Select
-		ba.id,
-		ba.basketNumber,
-		ba.userId,
-		u.firstname,
-		u.lastname,
-		u.email
-		From
+	<select id="selectBasketsOfUser" parameterType="User"
+		resultMap="basketResultMap">
+		Select * From
 		Baskets ba
 		join Users u on u.id=ba.userId
 		where u.email=#{user.email}
 	</select>
+
+	<select id="selectBasketFromId" parameterType="Integer"
+		resultMap="basketResultMap">
+		SELECT * FROM Baskets WHERE id=#{basketId}
+	</select>
+
+	<select id="selectBasketFromIdAndUser"
+		resultMap="basketResultMap">
+		SELECT * FROM Baskets ba
+		JOIN Users u ON u.id = ba.userId
+		WHERE u.email = #{email}
+		AND ba.basketNumber = #{basketNumber}
+	</select>
+
+	<insert id="createBasketFromuser" parameterType="Basket"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO
+		Baskets(
+		userId,
+		basketNumber
+		) VALUES (
+		#{basket.userId.id},
+		#{basket.basketNumber}
+		)
+	</insert>
 
 
 </mapper>

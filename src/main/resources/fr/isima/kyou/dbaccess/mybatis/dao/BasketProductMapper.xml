@@ -24,7 +24,7 @@
 		<result property="barCode" column="barCode" />
 	</resultMap>
 
-	<resultMap id="basketProductResultMap" type="BasketProduct">
+	<resultMap type="BasketProduct" id="basketProductResultMap">
 		<id property="id" column="id" />
 		<result property="productNumber" column="productNumber" />
 		<association property="product" column="productId"
@@ -37,10 +37,46 @@
 		resultMap="basketProductResultMap">
 		select * from basketProducts bp
 		join Baskets ba on
-		ba.id=bp.basketId
+		ba.id = bp.basketId
 		join Products pr on pr.id=bp.productId
 		where
-		bp.basketId=#{basket.id}
+		bp.basketId = #{basket.id}
 	</select>
+	
+	<select id="selectProductFromBasket"
+		resultMap="basketProductResultMap">
+		SELECT * FROM basketProducts bp
+		JOIN Baskets ba ON
+		ba.id = bp.basketId
+		JOIN Products pr ON pr.id = bp.productId
+		WHERE bp.basketId = #{basket.id}
+		AND bp.productId = #{product.id}
+	</select>
+	
+	<update id="updateProductNumberInBasketProduct" parameterType="BasketProduct" >
+		UPDATE BasketProducts
+		SET productNumber = #{basketProduct.productNumber}
+		WHERE id = #{basketProduct.id}
+	</update>
+	
+	<insert id="addNewProductInBasketProduct" parameterType="BasketProduct" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO BasketProducts (
+			basketId,
+			productId,
+			productNumber
+		)
+		VALUES (
+			#{basketProduct.basketId.id},
+			#{basketProduct.productId.id},
+			#{basketProduct.productNumber}
+		)
+	</insert>
+	
+	<delete id="removeProductFromBasketProduct" parameterType="BasketProduct" >
+		DELETE FROM BasketProducts
+		WHERE id = #{basketProduct.id}
+	</delete>
+	
+		
 </mapper>
 
