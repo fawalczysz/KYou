@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="fr.isima.kyou.dbaccess.mybatis.dao.NutrimentMapper">
+
+	<resultMap type="Nutriment" id="nutrimentResultMap">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="component" column="component" />
+		<result property="valueFor100g" column="valueFor100g" />
+		<association property="product" column="productId"
+			resultMap="productResultMap" />
+	</resultMap>
+	
+	<resultMap type="Product" id="productResultMap">
+		<id property="id" column="id" />
+		<result property="barCode" column="barCode" />
+	</resultMap>
+
+	<select id="selectNutrimentsFromProduct" parameterType="Product"
+		resultMap="nutrimentResultMap">
+		SELECT * FROM Nutriments
+		JOIN Products P ON P.id = productId
+		WHERE productId = #{product.id}
+	</select>
+	
+	<insert id="addNutriment" parameterType="Nutriment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO Nutriments (
+			productId,
+			name,
+			component,
+			valueFor100g
+		)
+		VALUES (
+			#{nutriment.productId.id},
+			#{nutriment.name},
+			#{nutriment.component},
+			#{nutriment.valueFor100g}
+		)
+	</insert>
+</mapper>
+
