@@ -5,26 +5,26 @@
 <mapper
 	namespace="fr.isima.kyou.dbaccess.mybatis.dao.BasketProductMapper">
 
-	<resultMap type="User" id="userResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.User" id="userResultMap">
 		<id property="id" column="id" />
 		<result property="firstname" column="firstname" />
 		<result property="lastname" column="lastname" />
 		<result property="email" column="email" />
 	</resultMap>
 
-	<resultMap type="Basket" id="basketResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.Basket" id="basketResultMap">
 		<id property="id" column="id" />
 		<result property="basketNumber" column="basketNumber" />
 		<association property="userId" column="userId"
 			resultMap="userResultMap" />
 	</resultMap>
 	
-	<resultMap type="Product" id="productResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.Product" id="productResultMap">
 		<id property="id" column="id" />
 		<result property="barCode" column="barCode" />
 	</resultMap>
 
-	<resultMap type="BasketProduct" id="basketProductResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.BasketProduct" id="basketProductResultMap">
 		<id property="id" column="id" />
 		<result property="productNumber" column="productNumber" />
 		<association property="product" column="productId"
@@ -33,8 +33,7 @@
 			resultMap="basketResultMap" />
 	</resultMap>
 
-	<select id="selectProductsFromBasket" parameterType="Basket"
-		resultMap="basketProductResultMap">
+	<select id="selectProductsFromBasket" resultMap="basketProductResultMap">
 		select * from basketProducts bp
 		join Baskets ba on
 		ba.id = bp.basketId
@@ -53,13 +52,13 @@
 		AND bp.productId = #{product.id}
 	</select>
 	
-	<update id="updateProductNumberInBasketProduct" parameterType="BasketProduct" >
+	<update id="updateProductNumberInBasketProduct">
 		UPDATE BasketProducts
 		SET productNumber = #{basketProduct.productNumber}
 		WHERE id = #{basketProduct.id}
 	</update>
 	
-	<insert id="addNewProductInBasketProduct" parameterType="BasketProduct" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	<insert id="addNewProductInBasketProduct" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		INSERT INTO BasketProducts (
 			basketId,
 			productId,
@@ -72,7 +71,7 @@
 		)
 	</insert>
 	
-	<delete id="removeProductFromBasketProduct" parameterType="BasketProduct" >
+	<delete id="removeProductFromBasketProduct" >
 		DELETE FROM BasketProducts
 		WHERE id = #{basketProduct.id}
 	</delete>

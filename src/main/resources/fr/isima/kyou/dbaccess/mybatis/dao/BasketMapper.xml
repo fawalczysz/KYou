@@ -5,14 +5,14 @@
 <mapper
 	namespace="fr.isima.kyou.dbaccess.mybatis.dao.BasketMapper">
 
-	<resultMap type="User" id="userResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.User" id="userResultMap">
 		<id property="id" column="id" />
 		<result property="firstname" column="firstname" />
 		<result property="lastname" column="lastname" />
 		<result property="email" column="email" />
 	</resultMap>
 
-	<resultMap type="Basket" id="basketResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.Basket" id="basketResultMap">
 		<id property="id" column="id" />
 		<result property="basketNumber" column="basketNumber" />
 		<association property="userId" column="userId"
@@ -20,7 +20,7 @@
 	</resultMap>
 
 
-	<select id="selectBasketsOfUser" parameterType="User"
+	<select id="selectBasketsOfUser"
 		resultMap="basketResultMap">
 		Select * From
 		Baskets ba
@@ -28,7 +28,7 @@
 		where u.email=#{user.email}
 	</select>
 
-	<select id="selectBasketFromId" parameterType="Integer"
+	<select id="selectBasketFromId"
 		resultMap="basketResultMap">
 		SELECT * FROM Baskets WHERE id=#{basketId}
 	</select>
@@ -41,7 +41,7 @@
 		AND ba.basketNumber = #{basketNumber}
 	</select>
 
-	<insert id="createBasketFromuser" parameterType="Basket"
+	<insert id="createBasketFromuser"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		INSERT INTO
 		Baskets(

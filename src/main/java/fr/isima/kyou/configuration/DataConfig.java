@@ -16,7 +16,9 @@ public class DataConfig {
 	@Bean
 	public DataSource dataSource() {
 		final SQLiteDataSource dataSource = new SQLiteDataSource();
-		dataSource.setUrl("jdbc:sqlite:C:\\Users\\fabie\\eclipse-workspace\\KYou\\src\\main\\resources\\kUser.db");
+		String url = "jdbc:sqlite:" + ClassLoader.getSystemClassLoader().getResource("kUser.db").getFile();
+		url = url.replace("/", "\\");
+		dataSource.setUrl(url);
 		return dataSource;
 	}
 

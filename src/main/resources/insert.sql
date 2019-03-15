@@ -1,0 +1,1 @@
+INSERT INTO Products (id,barCode) values(0,'1234');

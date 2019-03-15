@@ -5,7 +5,7 @@
 <mapper
 	namespace="fr.isima.kyou.dbaccess.mybatis.dao.NutrimentMapper">
 
-	<resultMap type="Nutriment" id="nutrimentResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.Nutriment" id="nutrimentResultMap">
 		<id property="id" column="id" />
 		<result property="name" column="name" />
 		<result property="component" column="component" />
@@ -14,19 +14,19 @@
 			resultMap="productResultMap" />
 	</resultMap>
 	
-	<resultMap type="Product" id="productResultMap">
+	<resultMap type="fr.isima.kyou.beans.dao.Product" id="productResultMap">
 		<id property="id" column="id" />
 		<result property="barCode" column="barCode" />
 	</resultMap>
 
-	<select id="selectNutrimentsFromProduct" parameterType="Product"
+	<select id="selectNutrimentsFromProduct"
 		resultMap="nutrimentResultMap">
 		SELECT * FROM Nutriments
 		JOIN Products P ON P.id = productId
 		WHERE productId = #{product.id}
 	</select>
 	
-	<insert id="addNutriment" parameterType="Nutriment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	<insert id="addNutriment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		INSERT INTO Nutriments (
 			productId,
 			name,

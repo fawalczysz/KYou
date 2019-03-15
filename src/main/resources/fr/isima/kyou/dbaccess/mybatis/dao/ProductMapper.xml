@@ -5,11 +5,11 @@
 <mapper
 	namespace="fr.isima.kyou.dbaccess.mybatis.dao.ProductMapper">
 
-	<select id="getProductFromBarCode" parameterType="String" resultType="Product">
+	<select id="getProductFromBarCode" parameterType="String" resultType="fr.isima.kyou.beans.dao.Product">
 		SELECT * FROM Products where barCode=#{barCode}
 	</select>
 	
-	<insert id="addProduct" parameterType="Product" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	<insert id="addProduct" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		INSERT INTO Products (barCode) VALUES (#{product.barCode})
 	</insert>
 
