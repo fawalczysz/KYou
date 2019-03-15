@@ -5,14 +5,14 @@ import java.util.List;
 import fr.isima.kyou.beans.dao.Basket;
 import fr.isima.kyou.beans.dao.BasketProduct;
 import fr.isima.kyou.beans.dao.Nutriment;
+import fr.isima.kyou.beans.dao.Product;
 import fr.isima.kyou.exceptions.DaoException;
 
 public interface IProductService {
 
 	List<BasketProduct> getProductsFromBasket(Basket basket);
 
-	void createProduct(String barCode, Double energyFor100g, Double saturedFatFor100g, Double sugarsFor100g,
-						Double saltFor100g, Double fiberFor100g, Double proteinsFor100g);
+	Product insertProductFromAPI(String barCode);
 
 	BasketProduct addProductInBasket(String email, String barCode, Integer basketId) throws DaoException;
 

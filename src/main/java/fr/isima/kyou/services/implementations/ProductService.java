@@ -1,15 +1,24 @@
 package fr.isima.kyou.services.implementations;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import fr.isima.kyou.apiaccess.OpenFoodGetter;
+import fr.isima.kyou.beans.api.Nutriments;
 import fr.isima.kyou.beans.dao.Basket;
 import fr.isima.kyou.beans.dao.BasketProduct;
 import fr.isima.kyou.beans.dao.Nutriment;
@@ -43,62 +52,67 @@ public class ProductService implements IProductService {
 	}
 	
 	@Override
-	public void createProduct(String barCode, Double energyFor100g, Double saturedFatFor100g, Double sugarsFor100g,
-			Double saltFor100g, Double fiberFor100g, Double proteinsFor100g) {
+	public Product insertProductFromAPI(String barCode) {
+		Product			product		= productMapper.getProductFromBarCode(barCode);
+		Nutriment		nutriment	= new Nutriment();
+		Nutriments		nutriments	= new Nutriments();
+		OpenFoodGetter	ofg			= OpenFoodGetter.getInstance();
 		
-		Product product = productMapper.getProductFromBarCode(barCode);
-		Nutriment nutriment	 = new Nutriment();
+		try { nutriments = ofg.getData(barCode).getProduct().getNutriments(); }
+		catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException | IOException | JSONException | UnirestException e) { e.printStackTrace(); }
 		
-		if (product == null) {
-			product = new Product();
-			product.setBarCode(barCode);
-			final Integer id = productMapper.addProduct(product);
-			product.setId(id);
-		}
-
+		if (product != null) return product;
+		
+		product = new Product();
+		product.setBarCode(barCode);
+		productMapper.addProduct(product);
+		product = productMapper.getProductFromBarCode(barCode);
+		
 		nutriment.setProduct(product);
 		
-		if (energyFor100g != null) {
+		if (nutriments.getEnergy100g() != null) {
 			nutriment.setName("energy_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(energyFor100g);
+			nutriment.setValuefor100g(Double.valueOf(nutriments.getEnergy100g()));
 			nutrimentMapper.addNutriment(nutriment);
 		}
 		
-		if(saturedFatFor100g != null) {
+		if(nutriments.getSaturatedFat100g() != null) {
 			nutriment.setName("satured-fat_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(saturedFatFor100g);
+			nutriment.setValuefor100g(nutriments.getSaturatedFat100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 		
-		if(sugarsFor100g != null) {
+		if(nutriments.getSugars100g() != null) {
 			nutriment.setName("sugars_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(sugarsFor100g);
+			nutriment.setValuefor100g(nutriments.getSugars100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 		
-		if(saltFor100g != null) {
+		if(nutriments.getSalt100g() != null) {
 			nutriment.setName("salt_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(saltFor100g);
+			nutriment.setValuefor100g(nutriments.getSalt100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 		
-		if(fiberFor100g != null) {
+		if(nutriments.getFiber100g() != null) {
 			nutriment.setName("fiber_100g");
 			nutriment.setComponent(true);
-			nutriment.setValuefor100g(fiberFor100g);
+			nutriment.setValuefor100g(nutriments.getFiber100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 		
-		if(proteinsFor100g != null) {
+		if(nutriments.getProteins100g() != null) {
 			nutriment.setName("proteins_100g");
 			nutriment.setComponent(true);
-			nutriment.setValuefor100g(proteinsFor100g);
+			nutriment.setValuefor100g(nutriments.getProteins100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
+		
+		return product;
 	}
 
 	@Override
@@ -111,12 +125,7 @@ public class ProductService implements IProductService {
 			throw new DaoException("Basket Does not exist");
 
 		Product product = productMapper.getProductFromBarCode(barCode);
-		if (product == null) {
-			product = new Product();
-			product.setBarCode(barCode);
-			final Integer id = productMapper.addProduct(product);
-			product.setId(id);
-		}
+		if (product == null) product = insertProductFromAPI(barCode);
 
 		BasketProduct bp = basketProductMapper.selectProductFromBasket(basket, product);
 		if (bp == null) {

@@ -1,58 +1,112 @@
 package fr.isima.kyou.beans.api;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Nutriments {
 
+	@SerializedName("energy_value")
     private String energyValue;
+	@SerializedName("energy_serving")
     private String energyServing;
+	@SerializedName("fiber")
     private Double fiber;
+	@SerializedName("nova-group_100g")
     private String novaGroup100g;
+	@SerializedName("sugars_100g")
     private Double sugars100g;
+	@SerializedName("proteins_value")
     private String proteinsValue;
+	@SerializedName("fiber_unit")
     private String fiberUnit;
+	@SerializedName("proteins_serving")
     private Double proteinsServing;
+	@SerializedName("energy")
     private String energy;
+	@SerializedName("salt_serving")
     private Double saltServing;
+	@SerializedName("sugars_value")
     private String sugarsValue;
+	@SerializedName("salt_unit")
     private String saltUnit;
+	@SerializedName("carbohydrates_serving")
     private Double carbohydratesServing;
+	@SerializedName("carbohydrates_100g")
     private String carbohydrates100g;
+	@SerializedName("saturated-fat_serving")
     private Double saturatedFatServing;
+	@SerializedName("saturated-fat_100g")
     private Double saturatedFat100g;
+	@SerializedName("fiber_value")
     private String fiberValue;
+	@SerializedName("salt_100g")
     private Double salt100g;
+	@SerializedName("fat_unit")
     private String fatUnit;
+	@SerializedName("salt")
     private Double salt;
+	@SerializedName("sodium_unit")
     private String sodiumUnit;
+	@SerializedName("fiber_100g")
     private Double fiber100g;
+	@SerializedName("proteins_unit")
     private String proteinsUnit;
+	@SerializedName("energy_unit")
     private String energyUnit;
+	@SerializedName("nutrition-score-uk")
     private Integer nutritionScoreUk;
+	@SerializedName("nutrition-score-fr_100g")
     private Integer nutritionScoreFr100g;
+	@SerializedName("fat_value")
     private String fatValue;
+	@SerializedName("salt_value")
     private String saltValue;
+	@SerializedName("nova-group")
     private String novaGroup;
+	@SerializedName("nutrition-score-fr")
     private Integer nutritionScoreFr;
+	@SerializedName("fat_100g")
     private Double fat100g;
+	@SerializedName("nova-group_serving")
     private String novaGroupServing;
+	@SerializedName("fat")
     private Double fat;
+	@SerializedName("carbohydrates_unit")
     private String carbohydratesUnit;
+	@SerializedName("sodium_100g")
     private Double sodium100g;
+	@SerializedName("fiber_serving")
     private Double fiberServing;
+	@SerializedName("sodium")
     private Double sodium;
+	@SerializedName("saturated-fat_unit")
     private String saturatedFatUnit;
+	@SerializedName("fat_serving")
     private Double fatServing;
+	@SerializedName("sugars_unit")
     private String sugarsUnit;
+	@SerializedName("energy_100g")
     private String energy100g;
+	@SerializedName("sodium_serving")
     private Double sodiumServing;
+	@SerializedName("saturated-fat_value")
     private String saturatedFatValue;
+	@SerializedName("saturated-fat")
     private Double saturatedFat;
+	@SerializedName("proteins_100g")
     private Double proteins100g;
+	@SerializedName("carbohydrates")
     private String carbohydrates;
+	@SerializedName("sugars")
     private Double sugars;
+	@SerializedName("sodium_value")
     private String sodiumValue;
+	@SerializedName("sugars_serving")
     private Double sugarsServing;
+	@SerializedName("proteins")
     private Double proteins;
+	@SerializedName("nutrition-score-uk_100g")
     private Integer nutritionScoreUk100g;
+	@SerializedName("carbohydrates_value")
     private String carbohydratesValue;
 
     public String getEnergyValue() {
