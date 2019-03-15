@@ -27,7 +27,9 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public Integer addUser(User user) {
+	public Integer addUser(User user) throws DaoException {
+		if (userMapper.getUser(user.getEmail()) != null)
+			throw new DaoException("email already exists");
 		userMapper.addUser(user);
 		return user.getId();
 	}

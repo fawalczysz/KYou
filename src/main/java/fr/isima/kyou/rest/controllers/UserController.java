@@ -43,7 +43,7 @@ public class UserController {
 
 	@GetMapping("/createUser")
 	public ResponseEntity<Integer> addUser(@RequestParam String firstname, @RequestParam String lastname,
-			@RequestParam String email) {
+			@RequestParam String email) throws DaoException {
 		final User user = new User(firstname, lastname, email);
 		return ResponseEntity.ok(userservice.addUser(user));
 	}

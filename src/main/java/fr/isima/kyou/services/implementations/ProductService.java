@@ -41,59 +41,59 @@ public class ProductService implements IProductService {
 	public List<BasketProduct> getProductsFromBasket(Basket basket) {
 		return basketProductMapper.selectProductsFromBasket(basket);
 	}
-	
+
 	@Override
 	public void createProduct(String barCode, Double energyFor100g, Double saturedFatFor100g, Double sugarsFor100g,
 			Double saltFor100g, Double fiberFor100g, Double proteinsFor100g) {
-		
+
 		Product product = productMapper.getProductFromBarCode(barCode);
-		Nutriment nutriment	 = new Nutriment();
-		
+		final Nutriment nutriment = new Nutriment();
+
 		if (product == null) {
 			product = new Product();
 			product.setBarCode(barCode);
 			final Integer id = productMapper.addProduct(product);
-			product.setId(id);
+			product = productMapper.getProductFromBarCode(barCode);
 		}
 
 		nutriment.setProduct(product);
-		
+
 		if (energyFor100g != null) {
 			nutriment.setName("energy_100g");
 			nutriment.setComponent(false);
 			nutriment.setValuefor100g(energyFor100g);
 			nutrimentMapper.addNutriment(nutriment);
 		}
-		
-		if(saturedFatFor100g != null) {
+
+		if (saturedFatFor100g != null) {
 			nutriment.setName("satured-fat_100g");
 			nutriment.setComponent(false);
 			nutriment.setValuefor100g(saturedFatFor100g);
 			nutrimentMapper.addNutriment(nutriment);
 		}
-		
-		if(sugarsFor100g != null) {
+
+		if (sugarsFor100g != null) {
 			nutriment.setName("sugars_100g");
 			nutriment.setComponent(false);
 			nutriment.setValuefor100g(sugarsFor100g);
 			nutrimentMapper.addNutriment(nutriment);
 		}
-		
-		if(saltFor100g != null) {
+
+		if (saltFor100g != null) {
 			nutriment.setName("salt_100g");
 			nutriment.setComponent(false);
 			nutriment.setValuefor100g(saltFor100g);
 			nutrimentMapper.addNutriment(nutriment);
 		}
-		
-		if(fiberFor100g != null) {
+
+		if (fiberFor100g != null) {
 			nutriment.setName("fiber_100g");
 			nutriment.setComponent(true);
 			nutriment.setValuefor100g(fiberFor100g);
 			nutrimentMapper.addNutriment(nutriment);
 		}
-		
-		if(proteinsFor100g != null) {
+
+		if (proteinsFor100g != null) {
 			nutriment.setName("proteins_100g");
 			nutriment.setComponent(true);
 			nutriment.setValuefor100g(proteinsFor100g);
@@ -114,8 +114,10 @@ public class ProductService implements IProductService {
 		if (product == null) {
 			product = new Product();
 			product.setBarCode(barCode);
-			final Integer id = productMapper.addProduct(product);
-			product.setId(id);
+
+			final Integer nb = productMapper.addProduct(product);
+			product = productMapper.getProductFromBarCode(barCode);
+
 		}
 
 		BasketProduct bp = basketProductMapper.selectProductFromBasket(basket, product);
@@ -148,6 +150,7 @@ public class ProductService implements IProductService {
 
 		if (bp.getProductNumber() == 1) {
 			basketProductMapper.removeProductFromBasketProduct(bp, product);
+			bp = null;
 		} else {
 			bp.setProductNumber(bp.getProductNumber() - 1);
 			basketProductMapper.updateProductNumberInBasketProduct(bp);
@@ -187,14 +190,15 @@ public class ProductService implements IProductService {
 	public List<Nutriment> getProductQualities(String barCode) {
 		Product product = new Product();
 		List<Nutriment> nutriments;
-		List<Nutriment> qualities = new ArrayList<>();
+		final List<Nutriment> qualities = new ArrayList<>();
 		product = productMapper.getProductFromBarCode(barCode);
 		nutriments = nutrimentMapper.selectNutrimentsFromProduct(product);
-		
-		for(Nutriment nutriment : nutriments) {
-			if(nutrimentIsQuality(nutriment)) qualities.add(nutriment);
+
+		for (final Nutriment nutriment : nutriments) {
+			if (nutrimentIsQuality(nutriment))
+				qualities.add(nutriment);
 		}
-		
+
 		return qualities;
 	}
 
@@ -202,14 +206,15 @@ public class ProductService implements IProductService {
 	public List<Nutriment> getProductDefects(String barCode) {
 		Product product = new Product();
 		List<Nutriment> nutriments;
-		List<Nutriment> defects = new ArrayList<>();
+		final List<Nutriment> defects = new ArrayList<>();
 		product = productMapper.getProductFromBarCode(barCode);
 		nutriments = nutrimentMapper.selectNutrimentsFromProduct(product);
-		
-		for(Nutriment nutriment : nutriments) {
-			if(nutrimentIsDefect(nutriment)) defects.add(nutriment);
+
+		for (final Nutriment nutriment : nutriments) {
+			if (nutrimentIsDefect(nutriment))
+				defects.add(nutriment);
 		}
-		
+
 		return defects;
 	}
 
@@ -218,18 +223,23 @@ public class ProductService implements IProductService {
 		Product product = new Product();
 		List<Nutriment> nutriments;
 		Integer score = 0;
-		
+
 		product = productMapper.getProductFromBarCode(barCode);
 		nutriments = nutrimentMapper.selectNutrimentsFromProduct(product);
-		
-		for(Nutriment nutriment : nutriments) score += getNutritionalScore(nutriment) * (nutriment.getComponent() ? -1 : 1);
-		
-		if (score < 0)  return "Très bon";
-		if (score < 3)  return "Bon";
-		if (score < 11) return "Moyen";
-		if (score < 19) return "Mauvais";
+
+		for (final Nutriment nutriment : nutriments)
+			score += getNutritionalScore(nutriment) * (nutriment.getComponent() ? -1 : 1);
+
+		if (score < 0)
+			return "Très bon";
+		if (score < 3)
+			return "Bon";
+		if (score < 11)
+			return "Moyen";
+		if (score < 19)
+			return "Mauvais";
 		return "Très mauvais";
-		
+
 	}
 
 	@Override
@@ -238,17 +248,16 @@ public class ProductService implements IProductService {
 		List<BasketProduct> products;
 		List<Nutriment> nutriments;
 		Nutriment nutTmp;
-		HashMap<String, Nutriment> nutrimentsSummary = new HashMap<>();
-		HashMap<String, Nutriment> basketQualities = new HashMap<>();
-		HashMap<String, Integer> nutrimentsSummaryCount = new HashMap<>();
-		
+		final HashMap<String, Nutriment> nutrimentsSummary = new HashMap<>();
+		final HashMap<String, Nutriment> basketQualities = new HashMap<>();
+		final HashMap<String, Integer> nutrimentsSummaryCount = new HashMap<>();
+
 		basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
 		products = getProductsFromBasket(basket);
-		
-		for(BasketProduct product : products) {
+
+		for (final BasketProduct product : products) {
 			nutriments = nutrimentMapper.selectNutrimentsFromProduct(product.getProduct());
-			for (Nutriment nutriment : nutriments)
-			{
+			for (final Nutriment nutriment : nutriments) {
 				nutTmp = nutrimentsSummary.get(nutriment.getName());
 				if (nutTmp == null) {
 					nutTmp = new Nutriment();
@@ -256,22 +265,23 @@ public class ProductService implements IProductService {
 					nutTmp.setComponent(nutriment.getComponent());
 					nutTmp.setValuefor100g(nutriment.getValuefor100g());
 					nutrimentsSummaryCount.put(nutriment.getName(), 1);
-				}
-				else {
+				} else {
 					nutTmp.setValuefor100g(nutTmp.getValuefor100g() + nutriment.getValuefor100g());
-					nutrimentsSummaryCount.put(nutriment.getName(), nutrimentsSummaryCount.get(nutriment.getName()) + 1);
+					nutrimentsSummaryCount.put(nutriment.getName(),
+							nutrimentsSummaryCount.get(nutriment.getName()) + 1);
 				}
-				
+
 				nutrimentsSummary.put(nutriment.getName(), nutTmp);
 			}
 		}
-		
-		for (Entry<String, Nutriment> nutrimentEntry : nutrimentsSummary.entrySet()) {
+
+		for (final Entry<String, Nutriment> nutrimentEntry : nutrimentsSummary.entrySet()) {
 			nutTmp = nutrimentEntry.getValue();
 			nutTmp.setValuefor100g(nutTmp.getValuefor100g() / nutrimentsSummaryCount.get(nutTmp.getName()));
-			if (nutrimentIsQuality(nutTmp)) basketQualities.put(nutrimentEntry.getKey(), nutTmp);
+			if (nutrimentIsQuality(nutTmp))
+				basketQualities.put(nutrimentEntry.getKey(), nutTmp);
 		}
-		
+
 		return new ArrayList<>(basketQualities.values());
 	}
 
@@ -281,17 +291,16 @@ public class ProductService implements IProductService {
 		List<BasketProduct> products;
 		List<Nutriment> nutriments;
 		Nutriment nutTmp;
-		HashMap<String, Nutriment> nutrimentsSummary = new HashMap<>();
-		HashMap<String, Nutriment> basketDefects = new HashMap<>();
-		HashMap<String, Integer> nutrimentsSummaryCount = new HashMap<>();
-		
+		final HashMap<String, Nutriment> nutrimentsSummary = new HashMap<>();
+		final HashMap<String, Nutriment> basketDefects = new HashMap<>();
+		final HashMap<String, Integer> nutrimentsSummaryCount = new HashMap<>();
+
 		basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
 		products = getProductsFromBasket(basket);
-		
-		for(BasketProduct product : products) {
+
+		for (final BasketProduct product : products) {
 			nutriments = nutrimentMapper.selectNutrimentsFromProduct(product.getProduct());
-			for (Nutriment nutriment : nutriments)
-			{
+			for (final Nutriment nutriment : nutriments) {
 				nutTmp = nutrimentsSummary.get(nutriment.getName());
 				if (nutTmp == null) {
 					nutTmp = new Nutriment();
@@ -299,50 +308,62 @@ public class ProductService implements IProductService {
 					nutTmp.setComponent(nutriment.getComponent());
 					nutTmp.setValuefor100g(nutriment.getValuefor100g());
 					nutrimentsSummaryCount.put(nutriment.getName(), 1);
-				}
-				else {
+				} else {
 					nutTmp.setValuefor100g(nutTmp.getValuefor100g() + nutriment.getValuefor100g());
-					nutrimentsSummaryCount.put(nutriment.getName(), nutrimentsSummaryCount.get(nutriment.getName()) + 1);
+					nutrimentsSummaryCount.put(nutriment.getName(),
+							nutrimentsSummaryCount.get(nutriment.getName()) + 1);
 				}
-				
+
 				nutrimentsSummary.put(nutriment.getName(), nutTmp);
 			}
 		}
-		
-		for (Entry<String, Nutriment> nutrimentEntry : nutrimentsSummary.entrySet()) {
+
+		for (final Entry<String, Nutriment> nutrimentEntry : nutrimentsSummary.entrySet()) {
 			nutTmp = nutrimentEntry.getValue();
 			nutTmp.setValuefor100g(nutTmp.getValuefor100g() / nutrimentsSummaryCount.get(nutTmp.getName()));
-			if (nutrimentIsDefect(nutTmp)) basketDefects.put(nutrimentEntry.getKey(), nutTmp);
+			if (nutrimentIsDefect(nutTmp))
+				basketDefects.put(nutrimentEntry.getKey(), nutTmp);
 		}
-		
+
 		return new ArrayList<>(basketDefects.values());
 	}
 
 	private Integer getNutritionalScore(Nutriment nutriment) {
 		double step = 0;
-		
-		switch (nutriment.getName())
-		{
-			case "energy_100g" :	  step = 335; break;
-			case "satured-fat_100g" : step = 1;   break;
-			case "sugars_100g" :	  step = 4.5; break;
-			case "salt_100g" :		  step = 0.09;  break;
-			case "fiber_100g" :		  step = 0.9; break;
-			case "proteins_100g" :	  step = 1.6; break;
+
+		switch (nutriment.getName()) {
+		case "energy_100g":
+			step = 335;
+			break;
+		case "satured-fat_100g":
+			step = 1;
+			break;
+		case "sugars_100g":
+			step = 4.5;
+			break;
+		case "salt_100g":
+			step = 0.09;
+			break;
+		case "fiber_100g":
+			step = 0.9;
+			break;
+		case "proteins_100g":
+			step = 1.6;
+			break;
 		}
-		Logger logger = LoggerFactory.getLogger(ProductService.class);
-		logger.debug(nutriment.getName() + " " + Math.min((int)Math.floor(nutriment.getValuefor100g() / step), 10));
-		return Math.min((int)Math.floor(nutriment.getValuefor100g() / step), nutriment.getComponent() ? 5 : 10);
+		final Logger logger = LoggerFactory.getLogger(ProductService.class);
+		logger.debug(nutriment.getName() + " " + Math.min((int) Math.floor(nutriment.getValuefor100g() / step), 10));
+		return Math.min((int) Math.floor(nutriment.getValuefor100g() / step), nutriment.getComponent() ? 5 : 10);
 	}
-	
+
 	private Boolean nutrimentIsQuality(Nutriment nutriment) {
-		return (nutriment.getComponent() && getNutritionalScore(nutriment) >= 2) ||
-			  (!nutriment.getComponent() && getNutritionalScore(nutriment) <= 3);
+		return (nutriment.getComponent() && getNutritionalScore(nutriment) >= 2)
+				|| (!nutriment.getComponent() && getNutritionalScore(nutriment) <= 3);
 	}
-	
+
 	private Boolean nutrimentIsDefect(Nutriment nutriment) {
-		return (nutriment.getComponent() && getNutritionalScore(nutriment) <= 0) ||
-			  (!nutriment.getComponent() && getNutritionalScore(nutriment) >= 7);
+		return (nutriment.getComponent() && getNutritionalScore(nutriment) <= 0)
+				|| (!nutriment.getComponent() && getNutritionalScore(nutriment) >= 7);
 	}
 
 }

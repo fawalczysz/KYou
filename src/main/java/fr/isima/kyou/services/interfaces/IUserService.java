@@ -13,7 +13,7 @@ public interface IUserService {
 
 	User getUser(String email);
 
-	Integer addUser(User user);
+	Integer addUser(User user) throws DaoException;
 
 	List<Basket> selectBasketsOfUser(User user);
 
