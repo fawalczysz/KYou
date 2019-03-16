@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.sqlite.SQLiteDataSource;
 
+/**
+ * Configuration used to link MyBatis Framework to sqlite database.
+ *
+ */
 @Configuration
 @MapperScan("fr.isima.kyou.dbaccess.mybatis.dao")
 public class DataConfig {

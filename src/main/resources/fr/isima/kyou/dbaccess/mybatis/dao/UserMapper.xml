@@ -5,7 +5,7 @@
 <mapper	namespace="fr.isima.kyou.dbaccess.mybatis.dao.UserMapper">
 
 	<select id="getUser" resultType="fr.isima.kyou.beans.dao.User">
-	  	SELECT * FROM Users WHERE email = #{userId}
+	  	SELECT * FROM Users WHERE email = #{email}
 	</select>
 	
 	<insert id="addUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">

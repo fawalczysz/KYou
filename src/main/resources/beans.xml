@@ -56,6 +56,9 @@
 	<bean id="productService"
 		class="fr.isima.kyou.services.implementations.ProductService" />
 
+	<bean id="openFoodGetter"
+		class="fr.isima.kyou.apiaccess.OpenFoodGetter" />
+
 
 	<jdbc:embedded-database id="testDataSource" type="H2">
 		<jdbc:script location="classpath:drop.sql" />

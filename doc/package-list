@@ -1,0 +1,11 @@
+fr.isima.kyou
+fr.isima.kyou.apiaccess
+fr.isima.kyou.beans.api
+fr.isima.kyou.beans.dao
+fr.isima.kyou.configuration
+fr.isima.kyou.dbaccess.mybatis.dao
+fr.isima.kyou.enums
+fr.isima.kyou.exceptions
+fr.isima.kyou.rest.controllers
+fr.isima.kyou.services.implementations
+fr.isima.kyou.services.interfaces

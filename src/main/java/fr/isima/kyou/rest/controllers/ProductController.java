@@ -8,9 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import fr.isima.kyou.beans.dao.Basket;
 import fr.isima.kyou.beans.dao.BasketProduct;
 import fr.isima.kyou.beans.dao.Nutriment;
+import fr.isima.kyou.beans.dao.Product;
+import fr.isima.kyou.enums.Score;
+import fr.isima.kyou.exceptions.ApiException;
 import fr.isima.kyou.exceptions.DaoException;
 import fr.isima.kyou.services.interfaces.IProductService;
 import fr.isima.kyou.services.interfaces.IUserService;
@@ -23,15 +27,27 @@ public class ProductController {
 
 	@Autowired
 	IUserService userService;
-	
-	// http://localhost:8080/createProduct?barCode=3029330003533&energyFor100g=1110&saturedFatFor100g=0.4&sugarsFor100g=7.2&saltFor100g=1.2&fiberFor100g=5.5&proteinsFor100g=8.9
+
+	/**
+	 * add new product in database using open food api. This product will not be
+	 * linked to any basket, its nutriments will however be recovered
+	 * 
+	 * @param barCode
+	 * @return
+	 * @throws ApiException
+	 */
 	@GetMapping("/createProduct")
-	public ResponseEntity<String> createProdcut(@RequestParam String barCode, Double energyFor100g, Double saturedFatFor100g, Double sugarsFor100g,
-										Double saltFor100g, Double fiberFor100g, Double proteinsFor100g) {
-		productService.createProduct(barCode, energyFor100g, saturedFatFor100g, sugarsFor100g, saltFor100g, fiberFor100g, proteinsFor100g);
-		return ResponseEntity.ok("Product created");
+	public ResponseEntity<Product> createProduct(@RequestParam String barCode) throws ApiException {
+		return ResponseEntity.ok(productService.insertProductFromAPI(barCode));
 	}
 
+	/**
+	 * get all products inside of a basket for a user and its basketNumber
+	 * 
+	 * @param basketId
+	 * @param email
+	 * @return
+	 */
 	@GetMapping("/products")
 	public ResponseEntity<List<BasketProduct>> getProductsFromBasket(@RequestParam Integer basketId,
 			@RequestParam String email) {
@@ -40,9 +56,18 @@ public class ProductController {
 		return ResponseEntity.ok(products);
 	}
 
+	/**
+	 * add a new product in basket for a user
+	 * 
+	 * @param basketId
+	 * @param email
+	 * @param barCode
+	 * @return
+	 * @throws ApiException
+	 */
 	@GetMapping("/addProduct")
 	public ResponseEntity addProductInBasket(@RequestParam Integer basketId, @RequestParam String email,
-			@RequestParam String barCode) {
+			@RequestParam String barCode) throws ApiException {
 		try {
 			return ResponseEntity.ok(productService.addProductInBasket(email, barCode, basketId));
 		} catch (final DaoException e) {
@@ -50,6 +75,14 @@ public class ProductController {
 		}
 	}
 
+	/**
+	 * removes only one item of a product in a basket
+	 * 
+	 * @param basketId
+	 * @param email
+	 * @param barCode
+	 * @return
+	 */
 	@GetMapping("/remove")
 	public ResponseEntity<String> removeProductInBasket(@RequestParam Integer basketId, @RequestParam String email,
 			@RequestParam String barCode) {
@@ -61,6 +94,14 @@ public class ProductController {
 		}
 	}
 
+	/**
+	 * removes all items of a product in a basket
+	 * 
+	 * @param basketId
+	 * @param email
+	 * @param barCode
+	 * @return
+	 */
 	@GetMapping("/removeAll")
 	public ResponseEntity<String> removeAllProductInBasket(@RequestParam Integer basketId, @RequestParam String email,
 			@RequestParam String barCode) {
@@ -71,34 +112,68 @@ public class ProductController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.toString());
 		}
 	}
-	
+
+	/**
+	 * returns qualities associated to product
+	 * 
+	 * @param barCode
+	 * @return
+	 * @throws DaoException
+	 */
 	@GetMapping("/qualities")
-	public ResponseEntity<List<Nutriment>> getProductQualities(@RequestParam String barCode)
-	{
+	public ResponseEntity<List<Nutriment>> getProductQualities(@RequestParam String barCode) throws DaoException {
 		return ResponseEntity.ok(productService.getProductQualities(barCode));
 	}
-	
+
+	/**
+	 * returns defects associated to product
+	 * 
+	 * @param barCode
+	 * @return
+	 * @throws DaoException
+	 */
 	@GetMapping("/defects")
-	public ResponseEntity<List<Nutriment>> getProductDefects(@RequestParam String barCode)
-	{
+	public ResponseEntity<List<Nutriment>> getProductDefects(@RequestParam String barCode) throws DaoException {
 		return ResponseEntity.ok(productService.getProductDefects(barCode));
 	}
-	
+
+	/**
+	 * return product nutritionnal score
+	 * 
+	 * @param barCode
+	 * @return
+	 * @throws DaoException
+	 */
 	@GetMapping("/score")
-	public ResponseEntity<String> getProductScore(@RequestParam String barCode)
-	{
+	public ResponseEntity<Score> getProductScore(@RequestParam String barCode) throws DaoException {
 		return ResponseEntity.ok(productService.getProductScore(barCode));
 	}
-	
+
+	/**
+	 * Returns the qualities associated to a basket. All nutriments in basket are
+	 * summed to get basket quality average
+	 * 
+	 * @param email
+	 * @param basketId
+	 * @return
+	 */
 	@GetMapping("/basketQualities")
-	public ResponseEntity<List<Nutriment>> getBasketQualities(@RequestParam String email, @RequestParam Integer basketId)
-	{
+	public ResponseEntity<List<Nutriment>> getBasketQualities(@RequestParam String email,
+			@RequestParam Integer basketId) {
 		return ResponseEntity.ok(productService.getBasketQualities(email, basketId));
 	}
-	
+
+	/**
+	 * Returns the defects associated to a basket. All nutriments in basket are
+	 * summed to get basket quality average
+	 * 
+	 * @param email
+	 * @param basketId
+	 * @return
+	 */
 	@GetMapping("/basketDefects")
-	public ResponseEntity<List<Nutriment>> getBasketDefects(@RequestParam String email, @RequestParam Integer basketId)
-	{
+	public ResponseEntity<List<Nutriment>> getBasketDefects(@RequestParam String email,
+			@RequestParam Integer basketId) {
 		return ResponseEntity.ok(productService.getBasketDefects(email, basketId));
 	}
 

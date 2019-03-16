@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.isima.kyou.apiaccess.IApiGetter;
+import fr.isima.kyou.beans.api.Nutriments;
 import fr.isima.kyou.beans.dao.Basket;
 import fr.isima.kyou.beans.dao.BasketProduct;
 import fr.isima.kyou.beans.dao.Nutriment;
@@ -19,9 +21,16 @@ import fr.isima.kyou.dbaccess.mybatis.dao.BasketMapper;
 import fr.isima.kyou.dbaccess.mybatis.dao.BasketProductMapper;
 import fr.isima.kyou.dbaccess.mybatis.dao.NutrimentMapper;
 import fr.isima.kyou.dbaccess.mybatis.dao.ProductMapper;
+import fr.isima.kyou.enums.Score;
+import fr.isima.kyou.exceptions.ApiException;
 import fr.isima.kyou.exceptions.DaoException;
 import fr.isima.kyou.services.interfaces.IProductService;
 
+/**
+ * Class used to process all calls used for product usage
+ *
+ *
+ */
 @Service
 public class ProductService implements IProductService {
 
@@ -37,72 +46,100 @@ public class ProductService implements IProductService {
 	@Autowired
 	private NutrimentMapper nutrimentMapper;
 
+	@Autowired
+	private IApiGetter ofg;
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<BasketProduct> getProductsFromBasket(Basket basket) {
 		return basketProductMapper.selectProductsFromBasket(basket);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
-	public void createProduct(String barCode, Double energyFor100g, Double saturedFatFor100g, Double sugarsFor100g,
-			Double saltFor100g, Double fiberFor100g, Double proteinsFor100g) {
-
+	public Product insertProductFromAPI(String barCode) throws ApiException {
 		Product product = productMapper.getProductFromBarCode(barCode);
-		final Nutriment nutriment = new Nutriment();
 
-		if (product == null) {
-			product = new Product();
-			product.setBarCode(barCode);
-			final Integer id = productMapper.addProduct(product);
-			product = productMapper.getProductFromBarCode(barCode);
+		if (product != null)
+			return product;
+
+		final Nutriment nutriment = new Nutriment();
+		Nutriments nutriments = new Nutriments();
+
+		nutriments = ofg.getData(barCode).getProduct().getNutriments();
+
+		if (nutriments == null) {
+			throw new ApiException("Product not found in api");
 		}
+
+		product = new Product();
+		product.setBarCode(barCode);
+		productMapper.addProduct(product);
+		product = productMapper.getProductFromBarCode(barCode);
 
 		nutriment.setProduct(product);
 
-		if (energyFor100g != null) {
+		if (nutriments.getEnergy100g() != null) {
+
 			nutriment.setName("energy_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(energyFor100g);
+			nutriment.setValuefor100g(Double.valueOf(nutriments.getEnergy100g()));
 			nutrimentMapper.addNutriment(nutriment);
 		}
 
-		if (saturedFatFor100g != null) {
+		if (nutriments.getSaturatedFat100g() != null) {
+
 			nutriment.setName("satured-fat_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(saturedFatFor100g);
+			nutriment.setValuefor100g(nutriments.getSaturatedFat100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 
-		if (sugarsFor100g != null) {
+		if (nutriments.getSugars100g() != null) {
+
 			nutriment.setName("sugars_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(sugarsFor100g);
+			nutriment.setValuefor100g(nutriments.getSugars100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 
-		if (saltFor100g != null) {
+		if (nutriments.getSalt100g() != null) {
 			nutriment.setName("salt_100g");
 			nutriment.setComponent(false);
-			nutriment.setValuefor100g(saltFor100g);
+			nutriment.setValuefor100g(nutriments.getSalt100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 
-		if (fiberFor100g != null) {
+		if (nutriments.getFiber100g() != null) {
+
 			nutriment.setName("fiber_100g");
 			nutriment.setComponent(true);
-			nutriment.setValuefor100g(fiberFor100g);
+			nutriment.setValuefor100g(nutriments.getFiber100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
 
-		if (proteinsFor100g != null) {
+		if (nutriments.getProteins100g() != null) {
+
 			nutriment.setName("proteins_100g");
 			nutriment.setComponent(true);
-			nutriment.setValuefor100g(proteinsFor100g);
+			nutriment.setValuefor100g(nutriments.getProteins100g());
 			nutrimentMapper.addNutriment(nutriment);
 		}
+
+		return product;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public BasketProduct addProductInBasket(String email, String barCode, Integer basketId) throws DaoException {
+	public BasketProduct addProductInBasket(String email, String barCode, Integer basketId)
+			throws DaoException, ApiException {
 		final User user = new User();
 		user.setEmail(email);
 		final Basket basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
@@ -111,14 +148,9 @@ public class ProductService implements IProductService {
 			throw new DaoException("Basket Does not exist");
 
 		Product product = productMapper.getProductFromBarCode(barCode);
-		if (product == null) {
-			product = new Product();
-			product.setBarCode(barCode);
 
-			final Integer nb = productMapper.addProduct(product);
-			product = productMapper.getProductFromBarCode(barCode);
-
-		}
+		if (product == null)
+			product = insertProductFromAPI(barCode);
 
 		BasketProduct bp = basketProductMapper.selectProductFromBasket(basket, product);
 		if (bp == null) {
@@ -136,6 +168,9 @@ public class ProductService implements IProductService {
 		return bp;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public BasketProduct removeProductInBasket(String email, String barCode, Integer basketId) throws DaoException {
 		Product product = null;
@@ -146,7 +181,7 @@ public class ProductService implements IProductService {
 		basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
 		bp = basketProductMapper.selectProductFromBasket(basket, product);
 
-		checkMandatories(product, basket, bp, email, barCode, basketId);
+		checkMandatories(product, basket, bp);
 
 		if (bp.getProductNumber() == 1) {
 			basketProductMapper.removeProductFromBasketProduct(bp, product);
@@ -158,6 +193,9 @@ public class ProductService implements IProductService {
 		return bp;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void removeAllProductInBasket(String email, String barCode, Integer basketId) throws DaoException {
 		Product product = new Product();
@@ -168,12 +206,19 @@ public class ProductService implements IProductService {
 		basket = basketMapper.selectBasketFromIdAndUser(basketId, email);
 		bp = basketProductMapper.selectProductFromBasket(basket, product);
 
-		checkMandatories(product, basket, bp, email, barCode, basketId);
+		checkMandatories(product, basket, bp);
 		basketProductMapper.removeProductFromBasketProduct(bp, product);
 	}
 
-	private void checkMandatories(Product product, Basket basket, BasketProduct bp, String email, String barCode,
-			Integer basketId) throws DaoException {
+	/**
+	 * check that all mandatory components have been get correctly from database
+	 * 
+	 * @param product
+	 * @param basket
+	 * @param bp
+	 * @throws DaoException
+	 */
+	private void checkMandatories(Product product, Basket basket, BasketProduct bp) throws DaoException {
 
 		if (product == null)
 			throw new DaoException("Product does not exist");
@@ -186,12 +231,19 @@ public class ProductService implements IProductService {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @throws DaoException
+	 */
 	@Override
-	public List<Nutriment> getProductQualities(String barCode) {
+	public List<Nutriment> getProductQualities(String barCode) throws DaoException {
 		Product product = new Product();
 		List<Nutriment> nutriments;
 		final List<Nutriment> qualities = new ArrayList<>();
 		product = productMapper.getProductFromBarCode(barCode);
+		if (product == null)
+			throw new DaoException("product does not exist");
 		nutriments = nutrimentMapper.selectNutrimentsFromProduct(product);
 
 		for (final Nutriment nutriment : nutriments) {
@@ -202,12 +254,19 @@ public class ProductService implements IProductService {
 		return qualities;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @throws DaoException
+	 */
 	@Override
-	public List<Nutriment> getProductDefects(String barCode) {
+	public List<Nutriment> getProductDefects(String barCode) throws DaoException {
 		Product product = new Product();
 		List<Nutriment> nutriments;
 		final List<Nutriment> defects = new ArrayList<>();
 		product = productMapper.getProductFromBarCode(barCode);
+		if (product == null)
+			throw new DaoException("product does not exist");
 		nutriments = nutrimentMapper.selectNutrimentsFromProduct(product);
 
 		for (final Nutriment nutriment : nutriments) {
@@ -218,30 +277,40 @@ public class ProductService implements IProductService {
 		return defects;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @throws DaoException
+	 */
 	@Override
-	public String getProductScore(String barCode) {
+	public Score getProductScore(String barCode) throws DaoException {
 		Product product = new Product();
 		List<Nutriment> nutriments;
 		Integer score = 0;
 
 		product = productMapper.getProductFromBarCode(barCode);
+		if (product == null)
+			throw new DaoException("product does not exist");
 		nutriments = nutrimentMapper.selectNutrimentsFromProduct(product);
 
 		for (final Nutriment nutriment : nutriments)
 			score += getNutritionalScore(nutriment) * (nutriment.getComponent() ? -1 : 1);
 
 		if (score < 0)
-			return "Très bon";
+			return Score.TRES_BON;
 		if (score < 3)
-			return "Bon";
+			return Score.BON;
 		if (score < 11)
-			return "Moyen";
+			return Score.MOYEN;
 		if (score < 19)
-			return "Mauvais";
-		return "Très mauvais";
+			return Score.MAUVAIS;
+		return Score.TRES_MAUVAIS;
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Nutriment> getBasketQualities(String email, Integer basketId) {
 		Basket basket = new Basket();
@@ -285,6 +354,9 @@ public class ProductService implements IProductService {
 		return new ArrayList<>(basketQualities.values());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Nutriment> getBasketDefects(String email, Integer basketId) {
 		Basket basket = new Basket();
@@ -328,6 +400,12 @@ public class ProductService implements IProductService {
 		return new ArrayList<>(basketDefects.values());
 	}
 
+	/**
+	 * Function calculating nutritionnal score of a nutriment
+	 * 
+	 * @param nutriment
+	 * @return
+	 */
 	private Integer getNutritionalScore(Nutriment nutriment) {
 		double step = 0;
 
@@ -356,11 +434,23 @@ public class ProductService implements IProductService {
 		return Math.min((int) Math.floor(nutriment.getValuefor100g() / step), nutriment.getComponent() ? 5 : 10);
 	}
 
+	/**
+	 * Returns true if the given nutriment is considered as a quality
+	 * 
+	 * @param nutriment
+	 * @return
+	 */
 	private Boolean nutrimentIsQuality(Nutriment nutriment) {
 		return (nutriment.getComponent() && getNutritionalScore(nutriment) >= 2)
 				|| (!nutriment.getComponent() && getNutritionalScore(nutriment) <= 3);
 	}
 
+	/**
+	 * Returns true if the given nutriment is considered as a defect
+	 * 
+	 * @param nutriment
+	 * @return
+	 */
 	private Boolean nutrimentIsDefect(Nutriment nutriment) {
 		return (nutriment.getComponent() && getNutritionalScore(nutriment) <= 0)
 				|| (!nutriment.getComponent() && getNutritionalScore(nutriment) >= 7);

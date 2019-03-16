@@ -12,6 +12,11 @@ import fr.isima.kyou.dbaccess.mybatis.dao.UserMapper;
 import fr.isima.kyou.exceptions.DaoException;
 import fr.isima.kyou.services.interfaces.IUserService;
 
+/**
+ * Class used to process all calls used for user and basket usage
+ *
+ *
+ */
 @Service
 public class UserService implements IUserService {
 
@@ -26,6 +31,9 @@ public class UserService implements IUserService {
 		return userMapper.getUser(email);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Integer addUser(User user) throws DaoException {
 		if (userMapper.getUser(user.getEmail()) != null)
@@ -34,16 +42,25 @@ public class UserService implements IUserService {
 		return user.getId();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Basket> selectBasketsOfUser(User user) {
 		return basketMapper.selectBasketsOfUser(user);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Basket selectBasketFromIdAndUser(String email, Integer basketId) {
 		return basketMapper.selectBasketFromIdAndUser(basketId, email);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Basket createBasketFromuser(Integer basketNumber, String email) throws DaoException {
 		final User user = userMapper.getUser(email);

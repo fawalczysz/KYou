@@ -2,6 +2,7 @@ package fr.isima.kyou;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import fr.isima.kyou.beans.dao.Basket;
 import fr.isima.kyou.beans.dao.BasketProduct;
 import fr.isima.kyou.beans.dao.User;
+import fr.isima.kyou.exceptions.ApiException;
 import fr.isima.kyou.exceptions.DaoException;
 import fr.isima.kyou.services.interfaces.IProductService;
 import fr.isima.kyou.services.interfaces.IUserService;
@@ -41,8 +43,17 @@ public class BasketTest {
 	}
 
 	@Test
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void getuser() throws DaoException, ApiException {
+		final User user = userService.getUser("toto.toto@toto.com");
+		assertEquals(0, user.getId().intValue());
+		assertEquals("toto", user.getFirstname());
+	}
+
+	@Test
 	@Sql(scripts = "classpath:clean.sql", config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
-	public void NormalTest() throws DaoException {
+	public void NormalTest() throws DaoException, ApiException {
 		final String email = "toto.toto@toto.com";
 		final String barCode = "1234";
 		final Integer basketNumber = 0;
@@ -92,7 +103,7 @@ public class BasketTest {
 
 	@Test
 	@Sql(scripts = "classpath:clean.sql", config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
-	public void addMultipleProducts() throws DaoException {
+	public void addMultipleProducts() throws DaoException, ApiException {
 		final String email = "toto.toto@toto.com";
 		String barCode = "1234";
 		final Integer basketNumber = 0;
@@ -139,7 +150,7 @@ public class BasketTest {
 
 	@Test
 	@Sql(scripts = "classpath:clean.sql", config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
-	public void removeMultipleProducts() throws DaoException {
+	public void removeMultipleProducts() throws DaoException, ApiException {
 		final String email = "toto.toto@toto.com";
 		final String barCode = "1234";
 		final Integer basketNumber = 0;
@@ -172,6 +183,64 @@ public class BasketTest {
 		final List<BasketProduct> products = productService.getProductsFromBasket(b);
 		assertEquals(0, products.size());
 
+	}
+
+	@Test
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void selectBaskets() throws DaoException, ApiException {
+		final User user = new User();
+		user.setFirstname("toto");
+		user.setLastname("toto");
+		user.setEmail("toto.toto@toto.com");
+		final List<Basket> baskets = userService.selectBasketsOfUser(user);
+		assertEquals(3, baskets.size());
+	}
+
+	@Test(expected = DaoException.class)
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void createWrongBasketNumber() throws DaoException, ApiException {
+		final Basket user = userService.createBasketFromuser(0, "toto.toto@toto.com");
+	}
+
+	@Test(expected = DaoException.class)
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void createWrongBasketUser() throws DaoException, ApiException {
+		final Basket user = userService.createBasketFromuser(0, "bla.bla@bla.com");
+	}
+
+	@Test(expected = DaoException.class)
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void mandatoriesCheckProduct() throws DaoException, ApiException {
+		final BasketProduct bp = productService.removeProductInBasket("toto.toto@toto.com", "wrong", 0);
+		fail();
+	}
+
+	@Test(expected = DaoException.class)
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void mandatoriesCheckBasket() throws DaoException, ApiException {
+		final BasketProduct bp = productService.removeProductInBasket("toto.toto@toto.com", "1234", 12);
+		fail();
+	}
+
+	@Test(expected = DaoException.class)
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void mandatoriesCheckBasketProduct() throws DaoException, ApiException {
+		final BasketProduct bp = productService.removeProductInBasket("toto.toto@toto.com", "12345678", 0);
+		fail();
+	}
+
+	@Test(expected = DaoException.class)
+	@Sql(scripts = { "classpath:clean.sql",
+			"classpath:insert.sql" }, config = @SqlConfig(dataSource = "testDataSource", transactionManager = "testTransactionManager"))
+	public void addWrongBasket() throws DaoException, ApiException {
+		final BasketProduct bp = productService.addProductInBasket("toto.toto@toto.com", "12345678", 10);
+		fail();
 	}
 
 }
